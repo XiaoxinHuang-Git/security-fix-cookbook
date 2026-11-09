@@ -1,5 +1,9 @@
 # security-fix-cookbook
 
+[![security](https://img.shields.io/badge/security-Other-lightgrey.svg)]()
+[![language](https://img.shields.io/badge/PHP-Go-Node.js-brightgreen.svg)]()
+[![license](https://img.shields.io/badge/License-MIT-yellow.svg)]()
+
 常见 Web 安全漏洞的「错误写法 → 正确写法」对照手册，覆盖 **PHP / Go / Node.js** 三种后端语言。
 
 不是漏洞原理教科书，而是一份可以直接对照改代码的速查表。
@@ -21,6 +25,10 @@
 | 06 | 硬编码密钥 / 敏感信息泄露 | [docs/06-hardcoded-secrets.md](docs/06-hardcoded-secrets.md) |
 | 07 | 越权访问（IDOR） | [docs/07-idor.md](docs/07-idor.md) |
 | 08 | 不安全反序列化 | [docs/08-insecure-deserialization.md](docs/08-insecure-deserialization.md) |
+| 09 | 安全响应头缺失 | [docs/09-security-headers.md](docs/09-security-headers.md) |
+| 10 | SSRF 服务端请求伪造 | [docs/10-ssrf.md](docs/10-ssrf.md) |
+| 11 | 暴力破解防护 | [docs/11-brute-force.md](docs/11-brute-force.md) |
+| 12 | 不安全 HTTPS 与敏感数据传输 | [docs/12-insecure-ssl.md](docs/12-insecure-ssl.md) |
 
 上线前自查： [checklist.md](checklist.md)
 
@@ -31,20 +39,33 @@
 3. 对照「错误写法」确认命中的是同一类问题
 4. 按「正确写法」修改，注意末尾的「判定要点」——不是每个扫描结果都是真漏洞，也不是每一处都要改成同一个方案
 
+## 覆盖的漏洞来源
+
+参考 OWASP Top 10（2021），按实际扫描工具（Nessus / SAST / 绿盟）报告中高频出现的漏洞类型整理。
+
+| OWASP 分类 | 本手册对应编号 |
+|---|---|
+| A01 注入 | 01 SQL 注入、04 命令注入 |
+| A02 加密机制失效 | 06 硬编码密钥、12 不安全 HTTPS |
+| A03 失效的访问控制 | 07 IDOR、10 SSRF |
+| A04 安全配置错误 | 09 响应头、12 TLS 配置 |
+| A05 脆弱的设计 | 11 暴力破解 |
+| A06 易受攻击的组件 | （升级依赖后用 06 的密钥管理思路） |
+| A07 身份验证和身份识别失效 | 11 暴力破解 |
+| A08 软件和数据完整性失效 | 05 路径穿越、08 反序列化 |
+| A09 安全日志和监控失效 | （日志本身不在修复范围，但 checklist 里有检查项） |
+| A10 服务器端请求伪造 | 10 SSRF |
+
 ## 约定
 
-- 代码片段只保留最小可复现结构，省略了框架初始化和错误处理
-- `❌` 标记的是会被扫描器命中的写法
-- `✅` 标记的是修复后的写法，优先选语言和框架自带的安全能力，其次才是手写过滤
-- 涉及文件路径、命令、SQL 标识符的场景，一律优先白名单，其次才是转义
+- 代码片段只保留最小可复现结构，省略了框架初始化和无关的依赖
+- 修复方案优先展示「最直接的写法」，不追求每个片段都引入新库
+- 判定要点部分记录「什么时候扫描结果是假阳性」以及「修复时容易漏掉的细节」
 
-## 免责声明
+## 贡献
 
-本仓库内容仅用于**自身代码的安全审查**和**获得授权的安全测试**。
-请勿用于未授权的渗透测试或攻击行为。
+欢迎 PR 补充更多漏洞类型、更多语言的修复方案，或者补充判定要点里的边缘案例。
 
-## 参考
+## License
 
-- [OWASP Top 10](https://owasp.org/www-project-top-ten/)
-- [OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/)
-- [CWE Top 25](https://cwe.mitre.org/top25/)
+MIT
